@@ -40,6 +40,23 @@ void GetConsoleSize(CONSOLESIZE *pConsize)
 }
 #endif
 
+int calcFitSize(int* image_width, int* image_height, int scr_width, int scr_height)
+{
+    double ri = *image_width / *image_height;
+    double rs = scr_width   / scr_height;
+
+    if (ri > rs)
+    {
+	*image_height = scr_width * (*image_height) / (*image_width); 
+	*image_width = scr_width;
+    }
+    else
+    {
+	*image_width = scr_height * (*image_width) / (*image_height);
+	*image_height = scr_height; 
+    }
+    return 0;
+}
 
 int main(int argc, char* argv[])
 {
@@ -60,7 +77,15 @@ int main(int argc, char* argv[])
 
     CONSOLESIZE console_size;
     GetConsoleSize(&console_size);
-    ShrinkImage(&image, &image_org, console_size.width / 2, console_size.height);
+
+    int console_max_width  = console_size.width / 2;
+    int console_max_height = console_size.height;
+    int image_width  = image_org.width;
+    int image_height = image_org.height;
+
+    calcFitSize(&image_width, &image_height, console_max_width, console_max_height);
+
+    ShrinkImage(&image, &image_org, image_width, image_height);
 
     for (int yi = 0; yi < image.height; yi++)
     {
